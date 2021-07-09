@@ -1,0 +1,29 @@
+public class AccountContactController{
+     
+    @AuraEnabled
+    public static AccountContactListWrapper getAccountWithContacts(String accountId){
+        AccountContactListWrapper accWrapper = new AccountContactListWrapper();
+        List<Account> accList = [SELECT Id,Name,Phone,
+                                    (SELECT AccountId, FirstName, LastName, Email From Contacts where AccountId =: accountId)
+                                    FROM Account WHERE  type != null];
+            List<Contact> contList = new List<Contact>();
+            accWrapper.accRecord = accList;
+            //accWrapper.contactList = accList.Contacts;
+            accWrapper.contactCount = accList[0].Contacts.size();
+             for(Account currentAccount : accList){
+            contList.addAll(currentAccount.Contacts);
+        }
+            accWrapper.contactList = contList;
+        return accWrapper;
+    }
+     
+    // wrapper class with @AuraEnabled and {get;set;} properties 
+    public class AccountContactListWrapper{
+        @AuraEnabled
+        public List<Account> accRecord{get;set;}
+        @AuraEnabled
+        public List<Contact> contactList{get;set;}
+        @AuraEnabled
+        public Integer contactCount{get;set;}
+    }
+}

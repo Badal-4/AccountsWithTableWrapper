@@ -1,0 +1,40 @@
+({
+    initData: function(component, event, helper) {
+         
+      //call apex class method
+      var action = component.get('c.getAccountWithContacts');
+        
+      action.setCallback(this, function(response) {
+        //store state of response
+        var state = response.getState();
+        if (state === "SUCCESS") {
+          //set response value in wrapperList attribute on component.
+          component.set('v.accountContactWrapper', response.getReturnValue());
+        }
+      });
+      $A.enqueueAction(action);
+    },
+    handleClick : function(component,event,helper)
+    {
+        component.set("v.bShowList",false);
+          var eventSource = event.getSource();
+         var i = eventSource.get('v.name');
+        alert(i);
+      //call apex class method
+      var act = component.get('c.getAccountWithContacts');
+        act.setParams({
+            accountId : i
+        });
+      act.setCallback(this, function(response) {
+        //store state of response
+        var state = response.getState();
+        if (state === "SUCCESS") {
+          //set response value in wrapperList attribute on component.
+          component.set('v.accountContactWrapper', response.getReturnValue());
+             component.set("v.bShowList",true);
+        }
+      });
+      $A.enqueueAction(act);
+       
+    }
+})
